@@ -5,6 +5,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
+	<bean id="teacherFactory" class="com.jessica.factory.TeacherFactory"/>
+    <bean id="teacherByFactory" class="com.jessica.entity.Teacher"
+    	factory-bean="teacherFactory" factory-method="creaTeacher"/>
+    	
     <bean id="teacher" class="com.jessica.entity.Teacher">
         <property name="firstName" value="Mayer"/>
         <property name="lastName" value="Susan"/>

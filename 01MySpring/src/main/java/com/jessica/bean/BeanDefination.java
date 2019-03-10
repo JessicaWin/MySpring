@@ -7,6 +7,24 @@ public class BeanDefination {
 	private String classPath;
 	private Scope scope = Scope.SINGLETON;
 	private Map<String, String> properties;
+	private String factoryBean;
+	private String factroyMethod;
+
+	public String getFactoryBean() {
+		return factoryBean;
+	}
+
+	public void setFactoryBean(String factoryBean) {
+		this.factoryBean = factoryBean;
+	}
+
+	public String getFactroyMethod() {
+		return factroyMethod;
+	}
+
+	public void setFactroyMethod(String factroyMethod) {
+		this.factroyMethod = factroyMethod;
+	}
 
 	public Map<String, String> getProperties() {
 		return properties;

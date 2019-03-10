@@ -3,8 +3,6 @@ package com.jessica;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import com.jessica.bean.MySpringXmlApplicationContext;
@@ -40,5 +38,35 @@ public class BeanTest {
 		assertEquals(teacher, teacher2);
 		Student student2 = (Student) context.getBean("student");
 		assertNotEquals(student, student2);
+
+		Teacher teacherByFactoryExp = new Teacher();
+		teacherByFactoryExp.setFirstName("Bean");
+		teacherByFactoryExp.setLastName("Factory");
+		teacherByFactoryExp.setTeacherNo(2);
+		teacherByFactoryExp.setWorkAge(1);
+
+		Teacher teacherByFactory = (Teacher) context.getBean("teacherByFactory");
+		assertEquals(teacherByFactory.getFirstName(), teacherByFactoryExp.getFirstName());
+		assertEquals(teacherByFactory.getLastName(), teacherByFactoryExp.getLastName());
+		assertEquals(teacherByFactory.getTeacherNo(), teacherByFactoryExp.getTeacherNo());
+		assertEquals(teacherByFactory.getWorkAge(), teacherByFactoryExp.getWorkAge());
+	}
+
+	@Test
+	public void testBeanFactory() throws Exception {
+		MySpringXmlApplicationContext context = new MySpringXmlApplicationContext(
+				"src/main/resources/com/jessica/config/spring-config.xml");
+
+		Teacher teacherByFactoryExp = new Teacher();
+		teacherByFactoryExp.setFirstName("Bean");
+		teacherByFactoryExp.setLastName("Factory");
+		teacherByFactoryExp.setTeacherNo(2);
+		teacherByFactoryExp.setWorkAge(1);
+
+		Teacher teacherByFactory = (Teacher) context.getBean("teacherByFactory");
+		assertEquals(teacherByFactory.getFirstName(), teacherByFactoryExp.getFirstName());
+		assertEquals(teacherByFactory.getLastName(), teacherByFactoryExp.getLastName());
+		assertEquals(teacherByFactory.getTeacherNo(), teacherByFactoryExp.getTeacherNo());
+		assertEquals(teacherByFactory.getWorkAge(), teacherByFactoryExp.getWorkAge());
 	}
 }

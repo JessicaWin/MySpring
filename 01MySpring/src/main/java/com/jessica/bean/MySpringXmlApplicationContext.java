@@ -1,6 +1,7 @@
 package com.jessica.bean;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,30 +43,49 @@ public class MySpringXmlApplicationContext {
 			return beanMap.get(beanId);
 		} else {
 			logger.debug("Create instance for " + beanDefination.getBeanId());
-			Class instanceClass = Class.forName(beanDefination.getClassPath());
-			Object instance = instanceClass.newInstance();
-
-			Field[] fields = instanceClass.getDeclaredFields();
-			beanDefination.getProperties().forEach((fieldName, value) -> {
-				for (int i = 0; i < fields.length; i++) {
-					Field field = fields[i];
-					field.setAccessible(true);
-					if (field.getName().equals(fieldName)) {
-						Class fieldType = field.getType();
-						ObjectMapper objectMapper = new ObjectMapper();
-						try {
-							field.set(instance, objectMapper.convertValue(value, fieldType));
-							logger.debug("Init field:" + fieldName +"="+ objectMapper.convertValue(value, fieldType) +" for bean " + beanDefination.getBeanId());
-						} catch (Exception e) {
-							e.printStackTrace();
-							logger.error("Can not init field:" + fieldName);
-						}
-						break;
-					}
+			if (beanDefination.getFactoryBean() != null) {
+				Object factory = this.getBean(beanDefination.getFactoryBean());
+				if (factory == null) {
+					logger.error("Can not find bean factory: " + beanDefination.getFactoryBean());
+					throw new Exception("Can not find bean factory: " + beanDefination.getFactoryBean());
 				}
-			});
-			beanMap.put(beanId, instance);
-			return instance;
+				Class factoryClass = factory.getClass();
+				Method method = factoryClass.getDeclaredMethod(beanDefination.getFactroyMethod(), null);
+				if (method == null) {
+					logger.error("Can not find method in calss: " + beanDefination.getFactroyMethod());
+					throw new Exception("Can not find method in calss: " + beanDefination.getFactroyMethod());
+				}
+				Object instance = method.invoke(factory, null);
+				beanMap.put(beanId, instance);
+				return instance;
+			} else {
+				Class instanceClass = Class.forName(beanDefination.getClassPath());
+				Object instance = instanceClass.newInstance();
+
+				Field[] fields = instanceClass.getDeclaredFields();
+				beanDefination.getProperties().forEach((fieldName, value) -> {
+					for (int i = 0; i < fields.length; i++) {
+						Field field = fields[i];
+						field.setAccessible(true);
+						if (field.getName().equals(fieldName)) {
+							Class fieldType = field.getType();
+							ObjectMapper objectMapper = new ObjectMapper();
+							try {
+								field.set(instance, objectMapper.convertValue(value, fieldType));
+								logger.debug(
+										"Init field:" + fieldName + "=" + objectMapper.convertValue(value, fieldType)
+												+ " for bean " + beanDefination.getBeanId());
+							} catch (Exception e) {
+								e.printStackTrace();
+								logger.error("Can not init field:" + fieldName);
+							}
+							break;
+						}
+					}
+				});
+				beanMap.put(beanId, instance);
+				return instance;
+			}
 		}
 	}
 
@@ -95,6 +115,10 @@ public class MySpringXmlApplicationContext {
 						beanDefination.setScope(
 								Scope.SINGLETON.getType().equals(attributeNode.getNodeValue()) ? Scope.SINGLETON
 										: Scope.PROTOTYPE);
+					} else if (attributeNode.getNodeName().equals("factory-bean")) {
+						beanDefination.setFactoryBean(attributeNode.getNodeValue());
+					} else if (attributeNode.getNodeName().equals("factory-method")) {
+						beanDefination.setFactroyMethod(attributeNode.getNodeValue());
 					}
 				}
 				logger.debug("Init bean defination for " + beanDefination.getBeanId());
