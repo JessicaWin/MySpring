@@ -9,7 +9,7 @@
     <bean id="teacherByFactory" class="com.jessica.entity.Teacher"
     	factory-bean="teacherFactory" factory-method="creaTeacher"/>
     	
-    <bean id="teacher" class="com.jessica.entity.Teacher">
+    <bean id="teacher" class="com.jessica.entity.Teacher" scope="singleton">
         <property name="firstName" value="Mayer"/>
         <property name="lastName" value="Susan"/>
         <property name="teacherNo" value="12"/>

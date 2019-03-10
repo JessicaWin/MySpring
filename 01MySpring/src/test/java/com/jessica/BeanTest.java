@@ -34,22 +34,25 @@ public class BeanTest {
 		assertEquals(student.getLastName(), studentExpected.getLastName());
 		assertEquals(student.getGrade(), studentExpected.getGrade());
 		assertEquals(student.getSutNo(), studentExpected.getSutNo());
+	}
+
+	@Test
+	public void testBeanSingleton() throws Exception {
+		MySpringXmlApplicationContext context = new MySpringXmlApplicationContext(
+				"src/main/resources/com/jessica/config/spring-config.xml");
+		Teacher teacher = (Teacher) context.getBean("teacher");
 		Teacher teacher2 = (Teacher) context.getBean("teacher");
 		assertEquals(teacher, teacher2);
+
+	}
+
+	@Test
+	public void testBeanPrototype() throws Exception {
+		MySpringXmlApplicationContext context = new MySpringXmlApplicationContext(
+				"src/main/resources/com/jessica/config/spring-config.xml");
+		Student student = (Student) context.getBean("student");
 		Student student2 = (Student) context.getBean("student");
 		assertNotEquals(student, student2);
-
-		Teacher teacherByFactoryExp = new Teacher();
-		teacherByFactoryExp.setFirstName("Bean");
-		teacherByFactoryExp.setLastName("Factory");
-		teacherByFactoryExp.setTeacherNo(2);
-		teacherByFactoryExp.setWorkAge(1);
-
-		Teacher teacherByFactory = (Teacher) context.getBean("teacherByFactory");
-		assertEquals(teacherByFactory.getFirstName(), teacherByFactoryExp.getFirstName());
-		assertEquals(teacherByFactory.getLastName(), teacherByFactoryExp.getLastName());
-		assertEquals(teacherByFactory.getTeacherNo(), teacherByFactoryExp.getTeacherNo());
-		assertEquals(teacherByFactory.getWorkAge(), teacherByFactoryExp.getWorkAge());
 	}
 
 	@Test

@@ -18,12 +18,14 @@ import org.w3c.dom.NodeList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jessica.bean.BeanDefination.Scope;
+import com.jessica.processor.impl.BeanPostProcessor;
 
 public class MySpringXmlApplicationContext {
 	private Logger logger = LogManager.getLogger(this.getClass());
 	private String configFilePath;
 	private Map<String, BeanDefination> beanDefinationMap;
 	private Map<String, Object> beanMap;
+	private BeanPostProcessor beanPostProcessor;
 
 	public MySpringXmlApplicationContext(String configFilePath) {
 		this.configFilePath = configFilePath;
@@ -61,30 +63,45 @@ public class MySpringXmlApplicationContext {
 			} else {
 				Class instanceClass = Class.forName(beanDefination.getClassPath());
 				Object instance = instanceClass.newInstance();
-
-				Field[] fields = instanceClass.getDeclaredFields();
-				beanDefination.getProperties().forEach((fieldName, value) -> {
-					for (int i = 0; i < fields.length; i++) {
-						Field field = fields[i];
-						field.setAccessible(true);
-						if (field.getName().equals(fieldName)) {
-							Class fieldType = field.getType();
-							ObjectMapper objectMapper = new ObjectMapper();
-							try {
-								field.set(instance, objectMapper.convertValue(value, fieldType));
-								logger.debug(
-										"Init field:" + fieldName + "=" + objectMapper.convertValue(value, fieldType)
-												+ " for bean " + beanDefination.getBeanId());
-							} catch (Exception e) {
-								e.printStackTrace();
-								logger.error("Can not init field:" + fieldName);
-							}
-							break;
-						}
+				Object newInstance = null;
+				if (!(instance instanceof BeanPostProcessor)) {
+					if (this.beanPostProcessor != null) {
+						newInstance = this.beanPostProcessor.postProcessBeforeInitialization(instance,
+								beanDefination.getBeanId());
 					}
-				});
-				beanMap.put(beanId, instance);
-				return instance;
+					Field[] fields = instanceClass.getDeclaredFields();
+					beanDefination.getProperties().forEach((fieldName, value) -> {
+						for (int i = 0; i < fields.length; i++) {
+							Field field = fields[i];
+							field.setAccessible(true);
+							if (field.getName().equals(fieldName)) {
+								Class fieldType = field.getType();
+								ObjectMapper objectMapper = new ObjectMapper();
+								try {
+									field.set(instance, objectMapper.convertValue(value, fieldType));
+									logger.debug("Init field:" + fieldName + "="
+											+ objectMapper.convertValue(value, fieldType) + " for bean "
+											+ beanDefination.getBeanId());
+								} catch (Exception e) {
+									e.printStackTrace();
+									logger.error("Can not init field:" + fieldName);
+								}
+								break;
+							}
+						}
+					});
+				}
+				if (this.beanPostProcessor != null) {
+					newInstance = this.beanPostProcessor.postProcessAfterInitialization(instance,
+							beanDefination.getBeanId());
+				}
+				if (newInstance != null) {
+					beanMap.put(beanId, newInstance);
+					return newInstance;
+				} else {
+					beanMap.put(beanId, instance);
+					return instance;
+				}
 			}
 		}
 	}
@@ -111,6 +128,12 @@ public class MySpringXmlApplicationContext {
 						beanDefination.setBeanId(attributeNode.getNodeValue());
 					} else if (attributeNode.getNodeName().equals("class")) {
 						beanDefination.setClassPath(attributeNode.getNodeValue());
+						Class instanceClass = Class.forName(beanDefination.getClassPath());
+						Object instance = instanceClass.newInstance();
+						if (instance instanceof BeanPostProcessor) {
+							this.beanPostProcessor = (BeanPostProcessor) instance;
+						}
+						beanMap.put(beanDefination.getBeanId(), instance);
 					} else if (attributeNode.getNodeName().equals("scope")) {
 						beanDefination.setScope(
 								Scope.SINGLETON.getType().equals(attributeNode.getNodeValue()) ? Scope.SINGLETON
