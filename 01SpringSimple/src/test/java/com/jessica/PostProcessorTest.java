@@ -23,4 +23,15 @@ public class PostProcessorTest {
 		assertEquals("HELLO, JESSICA.", result);
 
 	}
+
+	@Test
+	public void testFactoryPostProcessor() {
+		ApplicationContext context = new ClassPathXmlApplicationContext(
+				"/com/jessica/config/spring-config-processor.xml");
+		BaseService baseService = (BaseService) context.getBean("myServiceByFactory");
+		String result = baseService.doSomething();
+		logger.debug(result);
+		assertEquals("HELLO, JESSICA.", result);
+	}
+
 }

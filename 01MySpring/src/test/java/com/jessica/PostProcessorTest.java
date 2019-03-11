@@ -22,4 +22,15 @@ public class PostProcessorTest {
 		assertEquals("HELLO, JESSICA.", result);
 
 	}
+
+	@Test
+	public void testFactoryPostProcessor() throws Exception {
+		MySpringXmlApplicationContext context = new MySpringXmlApplicationContext(
+				"src/main/resources/com/jessica/config/spring-config-processor.xml");
+		BaseService baseService = (BaseService) context.getBean("myServiceByFactory");
+		String result = baseService.doSomething();
+		logger.debug(result);
+		assertEquals("HELLO, JESSICA.", result);
+
+	}
 }

@@ -46,62 +46,9 @@ public class MySpringXmlApplicationContext {
 		} else {
 			logger.debug("Create instance for " + beanDefination.getBeanId());
 			if (beanDefination.getFactoryBean() != null) {
-				Object factory = this.getBean(beanDefination.getFactoryBean());
-				if (factory == null) {
-					logger.error("Can not find bean factory: " + beanDefination.getFactoryBean());
-					throw new Exception("Can not find bean factory: " + beanDefination.getFactoryBean());
-				}
-				Class factoryClass = factory.getClass();
-				Method method = factoryClass.getDeclaredMethod(beanDefination.getFactroyMethod(), null);
-				if (method == null) {
-					logger.error("Can not find method in calss: " + beanDefination.getFactroyMethod());
-					throw new Exception("Can not find method in calss: " + beanDefination.getFactroyMethod());
-				}
-				Object instance = method.invoke(factory, null);
-				beanMap.put(beanId, instance);
-				return instance;
+				return this.createInstanceFromFactory(beanDefination);
 			} else {
-				Class instanceClass = Class.forName(beanDefination.getClassPath());
-				Object instance = instanceClass.newInstance();
-				Object newInstance = null;
-				if (!(instance instanceof BeanPostProcessor)) {
-					if (this.beanPostProcessor != null) {
-						newInstance = this.beanPostProcessor.postProcessBeforeInitialization(instance,
-								beanDefination.getBeanId());
-					}
-					Field[] fields = instanceClass.getDeclaredFields();
-					beanDefination.getProperties().forEach((fieldName, value) -> {
-						for (int i = 0; i < fields.length; i++) {
-							Field field = fields[i];
-							field.setAccessible(true);
-							if (field.getName().equals(fieldName)) {
-								Class fieldType = field.getType();
-								ObjectMapper objectMapper = new ObjectMapper();
-								try {
-									field.set(instance, objectMapper.convertValue(value, fieldType));
-									logger.debug("Init field:" + fieldName + "="
-											+ objectMapper.convertValue(value, fieldType) + " for bean "
-											+ beanDefination.getBeanId());
-								} catch (Exception e) {
-									e.printStackTrace();
-									logger.error("Can not init field:" + fieldName);
-								}
-								break;
-							}
-						}
-					});
-				}
-				if (this.beanPostProcessor != null) {
-					newInstance = this.beanPostProcessor.postProcessAfterInitialization(instance,
-							beanDefination.getBeanId());
-				}
-				if (newInstance != null) {
-					beanMap.put(beanId, newInstance);
-					return newInstance;
-				} else {
-					beanMap.put(beanId, instance);
-					return instance;
-				}
+				return this.createBeanInstance(beanDefination);
 			}
 		}
 	}
@@ -120,63 +67,135 @@ public class MySpringXmlApplicationContext {
 			logger.debug("There are " + beanList.getLength() + "beans");
 			for (int i = 0; i < beanList.getLength(); i++) {
 				Node bean = beanList.item(i);
-				NamedNodeMap attrs = bean.getAttributes();
-				BeanDefination beanDefination = new BeanDefination();
-				for (int attrIndex = 0; attrIndex < attrs.getLength(); attrIndex++) {
-					Node attributeNode = attrs.item(attrIndex);
-					if (attributeNode.getNodeName().equals("id")) {
-						beanDefination.setBeanId(attributeNode.getNodeValue());
-					} else if (attributeNode.getNodeName().equals("class")) {
-						beanDefination.setClassPath(attributeNode.getNodeValue());
-						Class instanceClass = Class.forName(beanDefination.getClassPath());
-						Object instance = instanceClass.newInstance();
-						if (instance instanceof BeanPostProcessor) {
-							this.beanPostProcessor = (BeanPostProcessor) instance;
-						}
-						beanMap.put(beanDefination.getBeanId(), instance);
-					} else if (attributeNode.getNodeName().equals("scope")) {
-						beanDefination.setScope(
-								Scope.SINGLETON.getType().equals(attributeNode.getNodeValue()) ? Scope.SINGLETON
-										: Scope.PROTOTYPE);
-					} else if (attributeNode.getNodeName().equals("factory-bean")) {
-						beanDefination.setFactoryBean(attributeNode.getNodeValue());
-					} else if (attributeNode.getNodeName().equals("factory-method")) {
-						beanDefination.setFactroyMethod(attributeNode.getNodeValue());
-					}
-				}
+				BeanDefination beanDefination = this.createBeanDefination(bean);
 				logger.debug("Init bean defination for " + beanDefination.getBeanId());
 				logger.debug("Init properties for bean " + beanDefination.getBeanId());
-				NodeList properNodeList = bean.getChildNodes();
-				Map<String, String> properties = new HashMap<String, String>();
-				for (int properIndex = 0; properIndex < properNodeList.getLength(); properIndex++) {
-					Node property = properNodeList.item(properIndex);
-					if (property.getNodeName().equals("property")) {
-						NamedNodeMap properAttrs = property.getAttributes();
-						String filedName = null, fieldValue = null;
-						for (int attrIndex = 0; attrIndex < properAttrs.getLength(); attrIndex++) {
-							Node attributeNode = properAttrs.item(attrIndex);
-							if (attributeNode.getNodeName().equals("name")) {
-								filedName = attributeNode.getNodeValue();
-							} else if (attributeNode.getNodeName().equals("value")) {
-								fieldValue = attributeNode.getNodeValue();
-							}
-						}
-						if (filedName != null && fieldValue != null) {
-							logger.debug("Add property for " + beanDefination.getBeanId() + ":(" + filedName + ","
-									+ fieldValue + ")");
-							properties.put(filedName, fieldValue);
-						} else {
-							logger.error("property is not right");
-							throw new Exception("property is not right");
-						}
-					}
-				}
-				beanDefination.setProperties(properties);
+				beanDefination.setProperties(this.getBeanProperties(bean));
 				beanDefinationMap.put(beanDefination.getBeanId(), beanDefination);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			logger.error(ex);
 		}
+	}
+
+	private Object createInstanceFromFactory(BeanDefination beanDefination) throws Exception {
+		Object factory = this.getBean(beanDefination.getFactoryBean());
+		if (factory == null) {
+			logger.error("Can not find bean factory: " + beanDefination.getFactoryBean());
+			throw new Exception("Can not find bean factory: " + beanDefination.getFactoryBean());
+		}
+		Class factoryClass = factory.getClass();
+		Method method = factoryClass.getDeclaredMethod(beanDefination.getFactroyMethod(), null);
+		if (method == null) {
+			logger.error("Can not find method in calss: " + beanDefination.getFactroyMethod());
+			throw new Exception("Can not find method in calss: " + beanDefination.getFactroyMethod());
+		}
+
+		Object instance = method.invoke(factory, null);
+		if (this.beanPostProcessor != null) {
+			instance = this.beanPostProcessor.postProcessBeforeInitialization(instance, beanDefination.getBeanId());
+		}
+		if (this.beanPostProcessor != null) {
+			instance = this.beanPostProcessor.postProcessAfterInitialization(instance, beanDefination.getBeanId());
+		}
+		beanMap.put(beanDefination.getBeanId(), instance);
+		return instance;
+	}
+
+	private Object createBeanInstance(BeanDefination beanDefination) throws Exception {
+		Class instanceClass = Class.forName(beanDefination.getClassPath());
+		Object instance = instanceClass.newInstance();
+		Object newInstance = null;
+		if (!(instance instanceof BeanPostProcessor)) {
+			if (this.beanPostProcessor != null) {
+				newInstance = this.beanPostProcessor.postProcessBeforeInitialization(instance,
+						beanDefination.getBeanId());
+			}
+			Field[] fields = instanceClass.getDeclaredFields();
+			beanDefination.getProperties().forEach((fieldName, value) -> {
+				for (int i = 0; i < fields.length; i++) {
+					Field field = fields[i];
+					field.setAccessible(true);
+					if (field.getName().equals(fieldName)) {
+						Class fieldType = field.getType();
+						ObjectMapper objectMapper = new ObjectMapper();
+						try {
+							field.set(instance, objectMapper.convertValue(value, fieldType));
+							logger.debug("Init field:" + fieldName + "=" + objectMapper.convertValue(value, fieldType)
+									+ " for bean " + beanDefination.getBeanId());
+						} catch (Exception e) {
+							e.printStackTrace();
+							logger.error("Can not init field:" + fieldName);
+						}
+						break;
+					}
+				}
+			});
+		}
+		if (this.beanPostProcessor != null) {
+			newInstance = this.beanPostProcessor.postProcessAfterInitialization(instance, beanDefination.getBeanId());
+		}
+		if (newInstance != null) {
+			beanMap.put(beanDefination.getBeanId(), newInstance);
+			return newInstance;
+		} else {
+			beanMap.put(beanDefination.getBeanId(), instance);
+			return instance;
+		}
+	}
+
+	private BeanDefination createBeanDefination(Node beanNode) throws Exception {
+		NamedNodeMap attrs = beanNode.getAttributes();
+		BeanDefination beanDefination = new BeanDefination();
+		for (int attrIndex = 0; attrIndex < attrs.getLength(); attrIndex++) {
+			Node attributeNode = attrs.item(attrIndex);
+			if (attributeNode.getNodeName().equals("id")) {
+				beanDefination.setBeanId(attributeNode.getNodeValue());
+			} else if (attributeNode.getNodeName().equals("class")) {
+				beanDefination.setClassPath(attributeNode.getNodeValue());
+				Class instanceClass = Class.forName(beanDefination.getClassPath());
+				Object instance = instanceClass.newInstance();
+				if (instance instanceof BeanPostProcessor) {
+					this.beanPostProcessor = (BeanPostProcessor) instance;
+				}
+				beanMap.put(beanDefination.getBeanId(), instance);
+			} else if (attributeNode.getNodeName().equals("scope")) {
+				beanDefination.setScope(Scope.SINGLETON.getType().equals(attributeNode.getNodeValue()) ? Scope.SINGLETON
+						: Scope.PROTOTYPE);
+			} else if (attributeNode.getNodeName().equals("factory-bean")) {
+				beanDefination.setFactoryBean(attributeNode.getNodeValue());
+			} else if (attributeNode.getNodeName().equals("factory-method")) {
+				beanDefination.setFactroyMethod(attributeNode.getNodeValue());
+			}
+		}
+		return beanDefination;
+	}
+
+	private Map<String, String> getBeanProperties(Node beanNode) throws Exception {
+		NodeList properNodeList = beanNode.getChildNodes();
+		Map<String, String> properties = new HashMap<String, String>();
+		for (int properIndex = 0; properIndex < properNodeList.getLength(); properIndex++) {
+			Node property = properNodeList.item(properIndex);
+			if (property.getNodeName().equals("property")) {
+				NamedNodeMap properAttrs = property.getAttributes();
+				String filedName = null, fieldValue = null;
+				for (int attrIndex = 0; attrIndex < properAttrs.getLength(); attrIndex++) {
+					Node attributeNode = properAttrs.item(attrIndex);
+					if (attributeNode.getNodeName().equals("name")) {
+						filedName = attributeNode.getNodeValue();
+					} else if (attributeNode.getNodeName().equals("value")) {
+						fieldValue = attributeNode.getNodeValue();
+					}
+				}
+				if (filedName != null && fieldValue != null) {
+					properties.put(filedName, fieldValue);
+				} else {
+					logger.error("property is not right");
+					throw new Exception("property is not right");
+				}
+			}
+		}
+		return properties;
 	}
 }

@@ -7,7 +7,7 @@ import java.lang.reflect.Proxy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.jessica.service.impl.MyService;
+import com.jessica.service.BaseService;
 
 public class MyBeanPostProcessor implements BeanPostProcessor {
 	private Logger logger = LogManager.getLogger(this.getClass());
@@ -22,7 +22,7 @@ public class MyBeanPostProcessor implements BeanPostProcessor {
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		logger.debug("Action After bean initialize....");
 		Class beanClass = bean.getClass();
-		if (beanClass.equals(MyService.class)) {
+		if (bean instanceof BaseService) {
 			Object proxy = Proxy.newProxyInstance(beanClass.getClassLoader(), beanClass.getInterfaces(),
 					new InvocationHandler() {
 						@Override

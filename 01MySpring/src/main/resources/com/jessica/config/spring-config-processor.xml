@@ -6,5 +6,10 @@
     http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<bean id="myService" class="com.jessica.service.impl.MyService"/>
+	
+	<bean id="myServiceFactory" class="com.jessica.factory.BaseServiceFactory"/>
+    <bean id="myServiceByFactory" class="com.jessica.service.impl.MyService"
+    	factory-bean="myServiceFactory" factory-method="createBaseService"/>
+    	
 	<bean id="postProcessor" class="com.jessica.processor.impl.MyBeanPostProcessor"/>
 </beans>
