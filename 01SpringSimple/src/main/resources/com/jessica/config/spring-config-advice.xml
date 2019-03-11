@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!--注册被监控的对象 -->
+	<bean id="person" class="com.jessica.service.impl.Person"/>
+	
+	<!--注册通知实现类-->
+	<bean id="beforeAdvice" class="com.jessica.advice.BeforeAdvice"/>
+	
+	<!-- 注册代理监控对象生产工厂 -->
+	<bean id="personProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="person"></property>
+		<property name="interceptorNames">
+			<array>
+				<value>beforeAdvice</value>
+			</array>
+		</property>
+	</bean>
+
+</beans>
