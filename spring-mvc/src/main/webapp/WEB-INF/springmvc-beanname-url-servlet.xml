@@ -1,0 +1,27 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/context/spring-mvc.xsd">
+	<!-- 公共配置，默认配置在org.springframework.web.servlet.Dispatcher类同包DispatcherServlet.properties下 -->
+    <!-- HandlerMapping，映射器，配置的bean.name对应请求的url，将请求的url映射为一个HandlerExecutionChain对象（包含一个Handler和多个HandlerInterceptor) -->
+    <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
+    <!-- HandlerAdapter，将handler包装为适配器，满足各种不同适配器的使用，Controller、SimpleFormController等 -->
+    <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/>
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/WEB-INF/jsp/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean>
+    <!-- handler,处理器，需要开发实现 -->
+    <bean name="/base" class="com.jessica.controller.BaseController"/>
+</beans>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!--注册被监控的对象 -->
+	<bean id="person" class="com.jessica.service.impl.Person"/>
+	<!--注册被监控的对象 -->
+	<bean id="dog" class="com.jessica.service.impl.Dog"/>
+	
+	<!--注册通知实现类-->
+	<bean id="beforeAdvice" class="com.jessica.advice.BeforeAdvice"/>
+
+	<bean id="classFilter" class="com.jessica.advisor.MyClassFilter"></bean>
+	<bean id="methodMatcher" class="com.jessica.advisor.MyMethodMatcher"></bean>
+	
+	<bean id="myPointCut" class="com.jessica.advisor.MyPointCut">
+		<property name="classFilter" ref="classFilter"></property>
+		<property name="methodMatcher" ref="methodMatcher"></property>
+	</bean>
+	
+	<bean id="myAdvisor" class="com.jessica.advisor.MyAdvisor">
+		<property name="advice" ref="beforeAdvice"></property>
+		<property name="pointCut" ref="myPointCut"></property>
+	</bean>
+	
+		<!-- 注册代理监控对象生产工厂,只会对person.eat方法的监控 -->
+	<bean id="personProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="person"></property>
+		<property name="interceptorNames">
+			<array>
+				<value>myAdvisor</value>
+			</array>
+		</property>
+	</bean>
+	
+	<bean id="dogProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="dog"></property>
+		<property name="interceptorNames">
+			<array>
+				<value>myAdvisor</value>
+			</array>
+		</property>
+	</bean>
+</beans>
