@@ -12,6 +12,4 @@
        http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
        http://www.springframework.org/schema/tx
        http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
-      <!-- 在springmvc.xml文件中也可以配置这个属性 -->  
-     <context:component-scan base-package="com.jessica.controller"/>
 </beans>

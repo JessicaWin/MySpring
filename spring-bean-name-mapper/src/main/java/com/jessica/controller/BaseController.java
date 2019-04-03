@@ -3,21 +3,18 @@ package com.jessica.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
-@Controller
-@RequestMapping(value = "/")
 public class BaseController extends AbstractController {
 	private static int counter = 0;
 	private static final String VIEW_INDEX = "home";
 
 	@Override
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(value = "/base", method = RequestMethod.GET)
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		ModelAndView mv = new ModelAndView();
@@ -32,9 +29,8 @@ public class BaseController extends AbstractController {
 	}
 
 	@Override
-	@RequestMapping(value = "/base", method = RequestMethod.GET)
-	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	@RequestMapping(value = "/base/1", method = RequestMethod.GET)
+	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ModelAndView mv = new ModelAndView();
 		ModelMap model = new ModelMap();
 		model.addAttribute("message", "Welcome ");
