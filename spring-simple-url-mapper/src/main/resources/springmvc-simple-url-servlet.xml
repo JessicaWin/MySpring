@@ -1,0 +1,43 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/context/spring-mvc.xsd">
+	<bean id="simpleUrlHandlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="order" value="0"></property>
+		<!-- <property name="mappings">
+			<props>
+				<prop key="/simple">simpleController</prop>
+			</props>
+		</property> -->
+		
+<!--  		<property name="urlMap">
+			<map>
+				<entry key="/" value-ref="simpleController"></entry>
+			</map>
+		</property> -->
+		
+		<property name="mappings">
+			<bean class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+				<property name="location">
+					<value>classpath:urlMap.properties</value>
+				</property>
+			</bean>
+		</property>
+	</bean>
+    <bean name="simpleController" class="com.jessica.controller.SimpleUrlMapperController"/>
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/WEB-INF/jsp/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean>
+</beans>
