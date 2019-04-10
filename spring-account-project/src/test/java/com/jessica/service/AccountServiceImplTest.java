@@ -1,3 +1,4 @@
+package com.jessica.service;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,7 @@ import com.jessica.service.AccountService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { RootApplicationContextConfig.class })
-public class AccountDaoImplTest {
+public class AccountServiceImplTest {
 
 	@Autowired
 	private AccountService accountService;
