@@ -5,9 +5,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @ComponentScan({ "com.jessica.service", "com.jessica.dao", "com.jessica.controller" })
+@EnableTransactionManagement
 public class RootApplicationContextConfig {
 //	@Bean(name = "dataSource")
 //	public ComboPooledDataSource dataSource() throws Exception {
@@ -35,4 +37,5 @@ public class RootApplicationContextConfig {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		return jdbcTemplate;
 	}
+
 }
