@@ -9,8 +9,13 @@
     <modules>
         <module>01SpringSimple</module>
         <module>01MySpring</module>
-    <module>myspring-mvc</module>
-  </modules>
+        <module>spring-account-project</module>
+        <module>spring-aop</module>
+        <module>spring-bean-name-mapper</module>
+        <module>spring-mvc-annotation-config</module>
+        <module>spring-mvc-xml-config</module>
+        <module>spring-simple-url-mapper</module>
+    </modules>
     <properties>
         <spring.version>5.0.0.RELEASE</spring.version>
         <log4j.version>2.7</log4j.version>
