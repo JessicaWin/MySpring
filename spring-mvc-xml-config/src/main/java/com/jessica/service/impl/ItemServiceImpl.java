@@ -35,4 +35,9 @@ public class ItemServiceImpl implements ItemService {
 		return itemDao.updateItem(item);
 	}
 
+	@Override
+	public List<Item> selectByName(String name) {
+		return itemDao.selectByName(name);
+	}
+
 }

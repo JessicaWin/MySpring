@@ -9,9 +9,22 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc
-        http://www.springframework.org/schema/context/spring-mvc.xsd">
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
   <context:component-scan
     base-package="com.jessica.controller"></context:component-scan>
+  <mvc:annotation-driven
+    conversion-service="conversionService"></mvc:annotation-driven>
+  <!-- 转换器配置 -->
+  <bean
+    id="conversionService"
+    class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+    <property name="converters">
+      <set>
+        <bean class="com.jessica.util.DateConverter" />
+      </set>
+    </property>
+  </bean>
+
   <bean
     class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="prefix">

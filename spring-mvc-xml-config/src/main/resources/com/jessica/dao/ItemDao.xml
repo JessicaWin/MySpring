@@ -13,6 +13,10 @@
     resultType="Item">
     select * from item where id=#{id}
   </select>
+  
+  <select id="selectByName" resultType="Item">
+    select * from item where name like '%' #{name} '%'
+  </select>
 
   <insert
     id="insertItem"

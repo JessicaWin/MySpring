@@ -7,6 +7,8 @@ import com.jessica.entity.Item;
 public interface ItemService {
 	List<Item> selectAll();
 
+	List<Item> selectByName(String name);
+
 	Item selectItemById(int id);
 
 	int insertItem(Item item);
