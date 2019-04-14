@@ -8,7 +8,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@ComponentScan({ "com.jessica.service", "com.jessica.dao", "com.jessica.controller" })
+@ComponentScan({ "com.jessica.service", "com.jessica.dao" })
 @EnableTransactionManagement
 public class RootApplicationContextConfig {
 //	@Bean(name = "dataSource")

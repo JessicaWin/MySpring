@@ -4,12 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 //定义Spring MVC扫描的包
-@ComponentScan({ "com.jessica" })
+@ComponentScan({ "com.jessica.controller" })
 //启动Spring MVC配置
+@EnableWebMvc
 public class WebServletConfig {
 	/***
 	 * 通过注解 @Bean 初始化视图解析器

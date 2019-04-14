@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class HomeController {
 	private static int counter = 0;
-	private static final String VIEW_INDEX = "index";
+	private static final String VIEW_INDEX = "home";
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String welcome(ModelMap model) {
