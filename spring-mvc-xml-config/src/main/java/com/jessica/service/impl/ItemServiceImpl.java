@@ -25,4 +25,14 @@ public class ItemServiceImpl implements ItemService {
 		return itemDao.insertItem(item);
 	}
 
+	@Override
+	public Item selectItemById(int id) {
+		return itemDao.selectItemById(id);
+	}
+
+	@Override
+	public int updateItem(Item item) {
+		return itemDao.updateItem(item);
+	}
+
 }

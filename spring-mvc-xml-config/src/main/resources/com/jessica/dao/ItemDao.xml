@@ -8,6 +8,12 @@
     resultType="Item">
     select * from item
   </select>
+  <select
+    id="selectItemById"
+    resultType="Item">
+    select * from item where id=#{id}
+  </select>
+
   <insert
     id="insertItem"
     parameterType="Item"
@@ -15,5 +21,8 @@
     insert into item (name, price, createTime, pic, detail)
     values (#{name}, #{price},#{createTime},#{pic},#{detail})
   </insert>
-
+  
+  <update id="updateItem" parameterType="Item">
+    update item set name=#{name}, price=#{price},createtime=#{createtime},detail=#{detail} where id=#{id}
+  </update>
 </mapper>
