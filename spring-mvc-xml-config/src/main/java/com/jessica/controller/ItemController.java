@@ -1,6 +1,8 @@
 package com.jessica.controller;
 
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,6 +31,28 @@ public class ItemController {
 	@RequestMapping("/queryItems")
 	public String queryItems(ItemQueryVo vo, HttpServletRequest request) {
 		List<Item> itemList = this.itemService.selectByName(vo.getItem().getName());
+		request.setAttribute("itemList", itemList);
+		return "item/item-list";
+	}
+
+	@RequestMapping("/queryItemByIdList")
+	public String queryItemByIdList(int[] id, HttpServletRequest request) {
+		List<Item> itemList = this.itemService.selectItemByIdArray(id);
+		request.setAttribute("itemList", itemList);
+		return "item/item-list";
+	}
+
+	@RequestMapping("/queryItemByPojoList")
+	public String queryItemByPojoList(ItemQueryVo vo, HttpServletRequest request) {
+		List<Integer> ids = vo.getItemList().stream().map(Item::getId).collect(Collectors.toList());
+		List<Item> itemList = this.itemService.selectItemByIdList(ids);
+		request.setAttribute("itemList", itemList);
+		return "item/item-list";
+	}
+
+	@RequestMapping("/queryItemByDate")
+	public String queryItemByDate(Date date, HttpServletRequest request) {
+		List<Item> itemList = this.itemService.selectItemByDate(date);
 		request.setAttribute("itemList", itemList);
 		return "item/item-list";
 	}
