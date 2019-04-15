@@ -44,7 +44,7 @@
   <update id="updateItem" parameterType="Item">
     update item set
     name=#{name},
-    price=#{price},createtime=#{createtime},detail=#{detail} where
+    price=#{price},createtime=#{createtime},pic=#{pic},detail=#{detail} where
     id=#{id}
   </update>
 </mapper>
