@@ -24,6 +24,8 @@
       </set>
     </property>
   </bean>
+  
+  <bean id="exceptionResolver" class="com.jessica.exception.resolver.BusinessExceptionResolver"/>
 
   <bean
     class="org.springframework.web.servlet.view.InternalResourceViewResolver">

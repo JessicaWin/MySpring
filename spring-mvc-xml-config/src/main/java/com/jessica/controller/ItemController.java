@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jessica.entity.Item;
+import com.jessica.exception.BusinessException;
 import com.jessica.service.ItemService;
 import com.jessica.vo.ItemQueryVo;
 
@@ -66,8 +67,11 @@ public class ItemController {
 	}
 
 	@RequestMapping("itemEdit")
-	public String showEditItemById(@RequestParam(name = "id") int id, HttpServletRequest request) {
+	public String showEditItemById(@RequestParam(name = "id") int id, HttpServletRequest request) throws Exception {
 		Item item = itemService.selectItemById(id);
+		if (item == null) {
+			throw new BusinessException("Can not find item");
+		}
 		request.setAttribute("item", item);
 		// 设置视图(逻辑路径)
 		return "item/item-edit";
