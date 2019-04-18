@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jessica.entity.Item;
@@ -70,6 +72,13 @@ public class ItemController {
 		request.setAttribute("item", item);
 		// 设置视图(逻辑路径)
 		return "item/item-edit";
+	}
+
+	@RequestMapping(value = "findItem/{id}", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public Item findItemById(@PathVariable(name = "id") int id, HttpServletRequest request) {
+		Item item = itemService.selectItemById(id);
+		return item;
 	}
 
 	@RequestMapping("itemEdit")
